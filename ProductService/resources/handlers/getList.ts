@@ -5,7 +5,7 @@ export const getList = async () => {
     statusCode: 200,
     headers: {
       "Access-Control-Allow-Headers": "Content-Type",
-      "Access-Control-Allow-Origin": "https://d1k2bkc4kshwu.cloudfront.net",
+      "Access-Control-Allow-Origin": "https://d2161gi96a21og.cloudfront.net",
       "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
     },
     body: JSON.stringify(products),

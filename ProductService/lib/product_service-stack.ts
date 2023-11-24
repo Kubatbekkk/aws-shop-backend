@@ -11,10 +11,14 @@ export class ProductServiceStack extends cdk.Stack {
 
     const api = new RestApi(this, "productsRestApi", {
       restApiName: "Product Service",
+      description: "This service serves /products",
       defaultCorsPreflightOptions: {
         allowOrigins: Cors.ALL_ORIGINS,
         allowMethods: Cors.ALL_METHODS,
         allowHeaders: Cors.DEFAULT_HEADERS,
+      },
+      deployOptions: {
+        stageName: "prod",
       },
     });
 
