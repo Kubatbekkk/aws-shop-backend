@@ -1,16 +1,37 @@
-import * as cdk from 'aws-cdk-lib';
-import { Construct } from 'constructs';
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
+import * as cdk from "aws-cdk-lib";
+import { Cors, LambdaIntegration, RestApi } from "aws-cdk-lib/aws-apigateway";
+import { Runtime } from "aws-cdk-lib/aws-lambda";
+import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
+import { Construct } from "constructs";
+import path = require("path");
 
 export class ProductServiceStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // The code that defines your stack goes here
+    const api = new RestApi(this, "productsRestApi", {
+      restApiName: "Product Service",
+      defaultCorsPreflightOptions: {
+        allowOrigins: Cors.ALL_ORIGINS,
+        allowMethods: Cors.ALL_METHODS,
+        allowHeaders: Cors.DEFAULT_HEADERS,
+      },
+    });
 
-    // example resource
-    // const queue = new sqs.Queue(this, 'ProductServiceQueue', {
-    //   visibilityTimeout: cdk.Duration.seconds(300)
-    // });
+    const lambdaGeneralProps = {
+      runtime: Runtime.NODEJS_18_X,
+      handler: "handler",
+    };
+
+    const getProductsList = new NodejsFunction(this, "getPRoductsList", {
+      ...lambdaGeneralProps,
+      entry: path.join(__dirname + "/../resources/lambdas/getProductsList.ts"),
+    });
+
+    const products = api.root.addResource("products");
+
+    const productsIntegration = new LambdaIntegration(getProductsList);
+
+    products.addMethod("GET", productsIntegration);
   }
 }
