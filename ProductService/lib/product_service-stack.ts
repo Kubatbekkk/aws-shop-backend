@@ -4,6 +4,7 @@ import { Runtime } from "aws-cdk-lib/aws-lambda";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Construct } from "constructs";
 import path = require("path");
+import { SwaggerUi } from "@pepperize/cdk-apigateway-swagger-ui";
 
 export class ProductServiceStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -45,5 +46,7 @@ export class ProductServiceStack extends cdk.Stack {
 
     products.addMethod("GET", productsIntegration);
     product.addMethod("GET", productIntegration);
+
+    new SwaggerUi(this, "SwaggerUI", { resource: api.root });
   }
 }
