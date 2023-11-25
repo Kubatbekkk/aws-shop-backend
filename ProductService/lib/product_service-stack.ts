@@ -29,12 +29,12 @@ export class ProductServiceStack extends cdk.Stack {
 
     const getProductsList = new NodejsFunction(this, "getPRoductsList", {
       ...lambdaGeneralProps,
-      entry: path.join(__dirname + "/../resources/lambdas/getProductsList.ts"),
+      entry: path.join(__dirname + "/../src/lambdas/getProductsList.ts"),
     });
 
     const getProductById = new NodejsFunction(this, "getProductById", {
       ...lambdaGeneralProps,
-      entry: path.join(__dirname + "/../resources/lambdas/getProductById.ts"),
+      entry: path.join(__dirname + "/../src/lambdas/getProductById.ts"),
     });
 
     const products = api.root.addResource("products");
