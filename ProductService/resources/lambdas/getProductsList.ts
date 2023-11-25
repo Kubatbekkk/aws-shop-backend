@@ -9,6 +9,10 @@ export const handler = async (event: APIGatewayProxyEvent) => {
       default:
         return {
           statusCode: 400,
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "*",
+          },
           body: JSON.stringify({ message: "Invalid HTTP method" }),
         };
     }
@@ -17,6 +21,10 @@ export const handler = async (event: APIGatewayProxyEvent) => {
 
     return {
       statusCode: 500,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "*",
+      },
       body: JSON.stringify({ message: error }),
     };
   }

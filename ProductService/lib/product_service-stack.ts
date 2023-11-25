@@ -15,7 +15,7 @@ export class ProductServiceStack extends cdk.Stack {
       defaultCorsPreflightOptions: {
         allowOrigins: Cors.ALL_ORIGINS,
         allowMethods: Cors.ALL_METHODS,
-        allowHeaders: Cors.DEFAULT_HEADERS,
+        allowHeaders: ["*"],
       },
       deployOptions: {
         stageName: "prod",
@@ -32,10 +32,18 @@ export class ProductServiceStack extends cdk.Stack {
       entry: path.join(__dirname + "/../resources/lambdas/getProductsList.ts"),
     });
 
+    const getProductById = new NodejsFunction(this, "getProductById", {
+      ...lambdaGeneralProps,
+      entry: path.join(__dirname + "/../resources/lambdas/getProductById.ts"),
+    });
+
     const products = api.root.addResource("products");
+    const product = products.addResource("{id}");
 
     const productsIntegration = new LambdaIntegration(getProductsList);
+    const productIntegration = new LambdaIntegration(getProductById);
 
     products.addMethod("GET", productsIntegration);
+    product.addMethod("GET", productIntegration);
   }
 }

@@ -1,5 +1,4 @@
 import type { APIGatewayProxyEvent } from "aws-lambda";
-import { getList } from "../handlers/getList";
 import { getById } from "../handlers/getById";
 
 export const handler = async (event: APIGatewayProxyEvent) => {
@@ -8,6 +7,10 @@ export const handler = async (event: APIGatewayProxyEvent) => {
   if (!productId) {
     return {
       statusCode: 404,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "*",
+      },
       body: JSON.stringify({
         statusCode: 404,
         message: "Missing path parameter: id",
@@ -22,6 +25,10 @@ export const handler = async (event: APIGatewayProxyEvent) => {
       default:
         return {
           statusCode: 400,
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "*",
+          },
           body: JSON.stringify({ message: "Invalid HTTP method" }),
         };
     }
