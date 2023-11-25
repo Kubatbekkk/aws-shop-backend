@@ -1,4 +1,4 @@
-import { products } from "../../mocks/products";
+import { products } from "../mocks/products";
 
 export const getList = async () => {
   return {
