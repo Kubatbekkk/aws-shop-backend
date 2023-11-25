@@ -1,12 +1,7 @@
+import { StatusCodes } from "http-status-codes";
 import { products } from "../mocks/products";
+import { response } from "../utils/response";
 
 export const getList = async () => {
-  return {
-    statusCode: 200,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers": "*",
-    },
-    body: JSON.stringify(products),
-  };
+  return response(StatusCodes.OK, products);
 };
