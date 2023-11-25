@@ -1,5 +1,8 @@
 import type { APIGatewayProxyEvent } from "aws-lambda";
 import { getList } from "../handlers/getList";
+import { StatusCodes } from "http-status-codes";
+import { HttpErrorMessages } from "../constants/constants";
+import { response } from "../utils/response";
 
 export const handler = async (event: APIGatewayProxyEvent) => {
   try {
@@ -7,25 +10,17 @@ export const handler = async (event: APIGatewayProxyEvent) => {
       case "GET":
         return await getList();
       default:
-        return {
-          statusCode: 400,
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Headers": "*",
-          },
-          body: JSON.stringify({ message: "Invalid HTTP method" }),
-        };
+        return response(StatusCodes.BAD_REQUEST, {
+          code: StatusCodes.BAD_REQUEST,
+          message: HttpErrorMessages.INVALID_METHOD_REQUEST,
+        });
     }
   } catch (error) {
     console.log(error);
 
-    return {
-      statusCode: 500,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "*",
-      },
-      body: JSON.stringify({ message: error }),
-    };
+    return response(StatusCodes.INTERNAL_SERVER_ERROR, {
+      code: StatusCodes.INTERNAL_SERVER_ERROR,
+      message: error,
+    });
   }
 };

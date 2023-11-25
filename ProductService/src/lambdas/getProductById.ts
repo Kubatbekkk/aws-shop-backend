@@ -1,21 +1,17 @@
 import type { APIGatewayProxyEvent } from "aws-lambda";
 import { getById } from "../handlers/getById";
+import { response } from "../utils/response";
+import { StatusCodes } from "http-status-codes";
+import { HttpErrorMessages } from "../constants/constants";
 
 export const handler = async (event: APIGatewayProxyEvent) => {
   const productId = event.pathParameters?.id;
 
   if (!productId) {
-    return {
-      statusCode: 404,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "*",
-      },
-      body: JSON.stringify({
-        statusCode: 404,
-        message: "Missing path parameter: id",
-      }),
-    };
+    return response(StatusCodes.NOT_FOUND, {
+      code: StatusCodes.NOT_FOUND,
+      message: HttpErrorMessages.MISSING_ID,
+    });
   }
 
   try {
@@ -23,21 +19,14 @@ export const handler = async (event: APIGatewayProxyEvent) => {
       case "GET":
         return await getById(productId);
       default:
-        return {
-          statusCode: 400,
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Headers": "*",
-          },
-          body: JSON.stringify({ message: "Invalid HTTP method" }),
-        };
+        return response(StatusCodes.BAD_REQUEST, {
+          code: StatusCodes.BAD_REQUEST,
+          message: HttpErrorMessages.INVALID_METHOD_REQUEST,
+        });
     }
   } catch (error) {
     console.log(error);
 
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ message: error }),
-    };
+    return response(StatusCodes.INTERNAL_SERVER_ERROR, { message: error });
   }
 };
