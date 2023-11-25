@@ -4,7 +4,7 @@ This project is a monorepo which contains the backend services.
 Services
 Product Service
 ...
-Swagger: https://app.swaggerhub.com/apis-docs/KUBINECCASTRO/ProductService/2023-11-24T
+Swagger: https://w2jwx3924e.execute-api.us-east-1.amazonaws.com/prod/api-docs/swagger-ui.html
 This documentation will provide you with an overview of all the available endpoints, their required parameters, and the response structure.
 
 Usage
@@ -24,7 +24,7 @@ cd ProductService
 
 npm install
 Tests
-The test infrastructure bases on Jest. Configuration setup is in jest file jest.config.js.~~
+The test infrastructure bases on Jest. Configuration setup is in jest file jest.config.js.
 
 running tests
 Unit tests can be run with the following command:
