@@ -1,12 +1,12 @@
 import type { Product } from "../models/product";
 import type { Exception } from "../models/exception";
-import { CorsHeaders } from "../constants/constants";
+import { CORS_ENABLE_HEADERS } from "../constants/constants";
 
 export const response = (
   statusCode: number,
   body: Product | Product[] | Exception
 ) => ({
   statusCode,
-  headers: CorsHeaders,
+  headers: CORS_ENABLE_HEADERS,
   body: JSON.stringify(body),
 });

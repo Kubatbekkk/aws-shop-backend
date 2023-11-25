@@ -1,8 +1,8 @@
-export enum CorsHeaders {
-  AllowHeaders = "Content-Type",
-  AllowOrigin = "*",
-  AllowMethods = "OPTIONS,POST,GET",
-}
+export const CORS_ENABLE_HEADERS = {
+  "Access-Control-Allow-Headers": "*",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
+};
 
 export enum HttpErrorMessages {
   NOT_FOUND = "Product not found",
