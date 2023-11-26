@@ -1,6 +1,6 @@
 import type { Stock } from "../models/stock";
 
-export const products: Stock[] = [
+export const stocks: Stock[] = [
   {
     product_id: "1",
     count: 3,
