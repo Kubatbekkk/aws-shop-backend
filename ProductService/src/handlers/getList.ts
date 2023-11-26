@@ -2,24 +2,26 @@ import { StatusCodes } from "http-status-codes";
 import { DynamoDBClient, ScanCommand } from "@aws-sdk/client-dynamodb";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
 import { response } from "../utils/response";
-import type { Product } from "../models/product";
 import type { Stock } from "../models/stock";
 import { HttpErrorMessages } from "../constants/constants";
 import type { TableParams } from "../models/table";
+import { Product } from "../models/product";
 
 const PRODUCTS_TABLE_NAME = process.env.PRODUCTS_TABLE_NAME || "products";
-const STOCKS_TABLE_NAME = process.env.STOCKS_TABLE_NAME || "stocks";
+
+type ProductParams = {
+  TableName: string;
+};
 
 export const getList = async () => {
   const dDBClient = new DynamoDBClient();
 
   try {
-    const productParams: TableParams = {
+    const productParams: ProductParams = {
       TableName: PRODUCTS_TABLE_NAME,
     };
-
-    const stockParams: TableParams = {
-      TableName: STOCKS_TABLE_NAME,
+    const stockParams: ProductParams = {
+      TableName: PRODUCTS_TABLE_NAME,
     };
 
     const productsResult = await dDBClient.send(new ScanCommand(productParams));
@@ -37,6 +39,7 @@ export const getList = async () => {
         message: HttpErrorMessages.NOT_FOUND,
       });
     }
+
     const unmarshalledProducts = productsResult.Items?.map((item) =>
       unmarshall(item)
     ) as Product[];
