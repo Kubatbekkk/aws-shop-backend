@@ -2,15 +2,13 @@ import { StatusCodes } from "http-status-codes";
 import { DynamoDBClient, ScanCommand } from "@aws-sdk/client-dynamodb";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
 import { response } from "../utils/response";
-import { Product } from "../models/product";
-import { Stock } from "../models/stock";
+import type { Product } from "../models/product";
+import type { Stock } from "../models/stock";
+import { HttpErrorMessages } from "../constants/constants";
+import type { TableParams } from "../models/table";
 
 const PRODUCTS_TABLE_NAME = process.env.PRODUCTS_TABLE_NAME || "products";
 const STOCKS_TABLE_NAME = process.env.STOCKS_TABLE_NAME || "stocks";
-
-type TableParams = {
-  TableName: string;
-};
 
 export const getList = async () => {
   const dDBClient = new DynamoDBClient();
@@ -27,6 +25,18 @@ export const getList = async () => {
     const productsResult = await dDBClient.send(new ScanCommand(productParams));
     const stockResult = await dDBClient.send(new ScanCommand(stockParams));
 
+    const notFound =
+      !productsResult.Items ||
+      productsResult.Items.length === 0 ||
+      !stockResult.Items ||
+      stockResult.Items.length === 0;
+
+    if (notFound) {
+      return response(StatusCodes.NOT_FOUND, {
+        code: StatusCodes.NOT_FOUND,
+        message: HttpErrorMessages.NOT_FOUND,
+      });
+    }
     const unmarshalledProducts = productsResult.Items?.map((item) =>
       unmarshall(item)
     ) as Product[];
@@ -39,7 +49,7 @@ export const getList = async () => {
       const stock = unmarshalledStock.find(
         (stockItem) => stockItem.product_id === product.id
       );
-      return { ...product, ...stock };
+      return stock ? { ...product, stock: stock.count } : product;
     });
 
     return response(StatusCodes.OK, joinedArray);
