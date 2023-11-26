@@ -67,6 +67,7 @@ export class ProductServiceStack extends cdk.Stack {
     });
 
     productsTable.grantReadWriteData(getProductById);
+    stocksTable.grantReadWriteData(getProductById);
 
     const products = api.root.addResource("products");
     const product = products.addResource("{id}");
