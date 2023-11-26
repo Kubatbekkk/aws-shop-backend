@@ -1,19 +1,19 @@
-AWS-SHOP-BACKEND
-This project is a monorepo which contains the backend services.
+| AWS-SHOP-BACKEND<br/>
+| Backend monorepo
 
-Services
-Product Service
-...
-Swagger: https://w2jwx3924e.execute-api.us-east-1.amazonaws.com/prod/api-docs/swagger-ui.html
+**Services** <br/>
+Product Service <br/>
+
+Swagger: https://w2jwx3924e.execute-api.us-east-1.amazonaws.com/prod/api-docs/swagger-ui.html <br/>
 This documentation will provide you with an overview of all the available endpoints, their required parameters, and the response structure.
 
-Usage
-To use API Documentation you need to copy openApi.yaml file, and pass it to the https://editor-next.swagger.io/.
+Docs Usage<br/>
+api-docs.yaml -> https://editor-next.swagger.io/.
 
 Product Service
 Deploy: https://w2jwx3924e.execute-api.us-east-1.amazonaws.com/prod/
 
-Developing
+```Developing
 Built With
 Node.js
 npm
@@ -32,3 +32,5 @@ Unit tests can be run with the following command:
 cd ProductService
 
 npm test
+
+```
