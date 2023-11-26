@@ -5,6 +5,7 @@ import { HttpErrorMessages } from "../constants/constants";
 import { response } from "../utils/response";
 
 export const handler = async (event: APIGatewayProxyEvent) => {
+  console.log("getProductsList event: ", event);
   try {
     switch (event.httpMethod) {
       case "GET":

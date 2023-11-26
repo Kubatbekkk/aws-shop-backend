@@ -53,6 +53,7 @@ export const getList = async () => {
 
     return response(StatusCodes.OK, joinedArray);
   } catch (error) {
+    console.log("getList error: ", error);
     return response(StatusCodes.INTERNAL_SERVER_ERROR, {
       code: StatusCodes.INTERNAL_SERVER_ERROR,
       message: error,

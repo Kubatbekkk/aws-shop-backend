@@ -6,6 +6,7 @@ import { HttpErrorMessages } from "../constants/constants";
 
 export const handler = async (event: APIGatewayProxyEvent) => {
   const productId = event.pathParameters?.id;
+  console.log("getProductById event, productId: ", event, productId);
 
   if (!productId) {
     return response(StatusCodes.NOT_FOUND, {
