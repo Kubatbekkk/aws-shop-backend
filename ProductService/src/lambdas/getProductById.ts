@@ -17,7 +17,7 @@ export const handler = async (event: APIGatewayProxyEvent) => {
   try {
     switch (event.httpMethod) {
       case "GET":
-        return await getById(productId);
+        return await getById({ id: productId });
       default:
         return response(StatusCodes.BAD_REQUEST, {
           code: StatusCodes.BAD_REQUEST,
@@ -27,6 +27,8 @@ export const handler = async (event: APIGatewayProxyEvent) => {
   } catch (error) {
     console.log(error);
 
-    return response(StatusCodes.INTERNAL_SERVER_ERROR, { message: error });
+    return response(StatusCodes.INTERNAL_SERVER_ERROR, {
+      message: error,
+    });
   }
 };

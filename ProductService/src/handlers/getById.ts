@@ -1,36 +1,56 @@
 import { StatusCodes } from "http-status-codes";
 import { response } from "../utils/response";
 import { HttpErrorMessages } from "../constants/constants";
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
-import { Product } from "../models/product";
+import {
+  DynamoDBClient,
+  GetItemCommand,
+  QueryCommand,
+} from "@aws-sdk/client-dynamodb";
+import { unmarshall } from "@aws-sdk/util-dynamodb";
 
-const PRODUCTS_TABLE_NAME = process.env.PRODUCTS_TABLE_NAME || "products";
+const STOCKS_TABLE_NAME = process.env.STOCKS_TABLE_NAME || "stocks";
 
-export const getById = async (id: string) => {
+export const getById = async ({ id }: { id: string }) => {
   const dDBClient = new DynamoDBClient();
-  const dDBDocClient = DynamoDBDocumentClient.from(dDBClient);
 
-  const productParams = {
-    TableName: PRODUCTS_TABLE_NAME,
+  const queryProductItemCommand = new QueryCommand({
+    TableName: process.env.PRODUCTS_TABLE_NAME,
+    ExpressionAttributeValues: { ":value": { S: id } },
+    KeyConditionExpression: "id = :value",
+  });
+
+  const stockParams = {
+    TableName: STOCKS_TABLE_NAME,
     Key: {
-      id,
+      product_id: { S: id },
     },
   };
 
+  const getStockItemCommand = new GetItemCommand(stockParams);
+
   try {
-    const productResult = await dDBDocClient.send(
-      new GetCommand<Product>(productParams)
+    const { Items: isExistProducts } = await dDBClient.send(
+      queryProductItemCommand
     );
 
-    if (!productResult.Item) {
+    const { Item: isExistStock } = await dDBClient.send(getStockItemCommand);
+
+    if (!isExistProducts || isExistProducts.length === 0) {
       return response(StatusCodes.NOT_FOUND, {
         code: StatusCodes.NOT_FOUND,
         message: HttpErrorMessages.NOT_FOUND,
       });
     }
 
-    return response(StatusCodes.OK, productResult.Item);
+    const productItem = isExistProducts[0];
+    const unmarshalledProductItem = unmarshall(productItem);
+
+    if (isExistStock) {
+      const unmarshalledStock = unmarshall(isExistStock);
+      unmarshalledProductItem.count = unmarshalledStock.count;
+    }
+
+    return response(StatusCodes.OK, unmarshalledProductItem);
   } catch (error) {
     console.error(error);
     return response(StatusCodes.INTERNAL_SERVER_ERROR, {

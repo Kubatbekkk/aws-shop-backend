@@ -4,20 +4,20 @@ import { unmarshall } from "@aws-sdk/util-dynamodb";
 import { response } from "../utils/response";
 import type { Stock } from "../models/stock";
 import { HttpErrorMessages } from "../constants/constants";
-import type { TableParams } from "../models/table";
 import { Product } from "../models/product";
 
 const PRODUCTS_TABLE_NAME = process.env.PRODUCTS_TABLE_NAME || "products";
+const STOCKS_TABLE_NAME = process.env.STOCKS_TABLE_NAME || "stocks";
 
 export const getList = async () => {
   const dDBClient = new DynamoDBClient();
 
   try {
-    const productParams: TableParams = {
+    const productParams = {
       TableName: PRODUCTS_TABLE_NAME,
     };
-    const stockParams: TableParams = {
-      TableName: PRODUCTS_TABLE_NAME,
+    const stockParams = {
+      TableName: STOCKS_TABLE_NAME,
     };
 
     const productsResult = await dDBClient.send(new ScanCommand(productParams));
@@ -48,7 +48,7 @@ export const getList = async () => {
       const stock = unmarshalledStock.find(
         (stockItem) => stockItem.product_id === product.id
       );
-      return stock ? { ...product, stock: stock.count } : product;
+      return stock ? { ...product, count: stock.count } : product;
     });
 
     return response(StatusCodes.OK, joinedArray);
