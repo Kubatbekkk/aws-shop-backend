@@ -9,18 +9,14 @@ import { Product } from "../models/product";
 
 const PRODUCTS_TABLE_NAME = process.env.PRODUCTS_TABLE_NAME || "products";
 
-type ProductParams = {
-  TableName: string;
-};
-
 export const getList = async () => {
   const dDBClient = new DynamoDBClient();
 
   try {
-    const productParams: ProductParams = {
+    const productParams: TableParams = {
       TableName: PRODUCTS_TABLE_NAME,
     };
-    const stockParams: ProductParams = {
+    const stockParams: TableParams = {
       TableName: PRODUCTS_TABLE_NAME,
     };
 
