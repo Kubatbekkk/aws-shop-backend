@@ -1,5 +1,5 @@
-AWS-SHOP-BACKEND
-Backend monorepo
+| AWS-SHOP-BACKEND<br/>
+| Backend monorepo
 
 **Services** <br/>
 Product Service <br/>
@@ -7,7 +7,7 @@ Product Service <br/>
 Swagger: https://w2jwx3924e.execute-api.us-east-1.amazonaws.com/prod/api-docs/swagger-ui.html <br/>
 This documentation will provide you with an overview of all the available endpoints, their required parameters, and the response structure.
 
-Docs Usage
+Docs Usage<br/>
 api-docs.yaml -> https://editor-next.swagger.io/.
 
 Product Service
