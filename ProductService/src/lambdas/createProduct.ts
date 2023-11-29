@@ -5,15 +5,15 @@ import { HttpErrorMessages } from "../constants/constants";
 import { response } from "../utils/response";
 
 export const handler = async (event: APIGatewayProxyEvent) => {
+  console.log("createProduct Incoming event:", event);
   try {
     if (event.httpMethod === "POST") {
       return await addProduct(event);
-    } else if (event.httpMethod !== "POST") {
-      return response(StatusCodes.BAD_REQUEST, {
-        code: StatusCodes.BAD_REQUEST,
-        message: HttpErrorMessages.INVALID_METHOD_REQUEST,
-      });
     }
+    return response(StatusCodes.BAD_REQUEST, {
+      code: StatusCodes.BAD_REQUEST,
+      message: HttpErrorMessages.INVALID_METHOD_REQUEST,
+    });
   } catch (error) {
     console.log(error);
 

@@ -18,20 +18,6 @@ type IncomingProductData = {
   count: number;
 };
 
-// const isValidProductData = (productData: IncomingProductData): boolean => {
-//   return (
-//     !!productData.title &&
-//     typeof productData.title === "string" &&
-//     !!productData.description &&
-//     typeof productData.description === "string" &&
-//     !!productData.price &&
-//     typeof productData.price === "number" &&
-//     productData.price > 0 &&
-//     typeof productData.count === "number" &&
-//     productData.count >= 0
-//   );
-// };
-
 const validateProductData = (
   productData: IncomingProductData
 ): string | null => {
