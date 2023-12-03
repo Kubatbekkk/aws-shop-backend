@@ -10,6 +10,7 @@ const s3Client = new S3Client();
 export const handler = async (event: APIGatewayProxyEvent) => {
   try {
     if (!event.queryStringParameters?.name) {
+      console.log("check purpose");
       return response(StatusCodes.BAD_REQUEST, {
         code: StatusCodes.BAD_REQUEST,
         message: HttpErrorMessages.MISSING_NAME,
