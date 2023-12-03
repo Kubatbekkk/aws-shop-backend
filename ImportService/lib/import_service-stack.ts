@@ -13,19 +13,6 @@ export class ImportServiceStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const api = new RestApi(this, "importService", {
-      restApiName: "Import Service",
-      description: "This service serves /import",
-      defaultCorsPreflightOptions: {
-        allowOrigins: Cors.ALL_ORIGINS,
-        allowMethods: Cors.ALL_METHODS,
-        allowHeaders: ["*"],
-      },
-      deployOptions: {
-        stageName: "prod",
-      },
-    });
-
     const bucket = Bucket.fromBucketName(
       this,
       "Import Bucket",
@@ -44,12 +31,23 @@ export class ImportServiceStack extends cdk.Stack {
 
     bucket.grantReadWrite(importProductsFile);
 
+    const api = new RestApi(this, "importService", {
+      restApiName: "Import Service",
+      description: "This service serves /import",
+      defaultCorsPreflightOptions: {
+        allowOrigins: Cors.ALL_ORIGINS,
+        allowMethods: Cors.ALL_METHODS,
+        allowHeaders: ["*"],
+      },
+      deployOptions: {
+        stageName: "prod",
+      },
+    });
+
+    const importResource = api.root.addResource("import");
     const importProductsFileIntegration = new LambdaIntegration(
       importProductsFile
     );
-
-    const importResource = api.root.addResource("import");
-
     importResource.addMethod("GET", importProductsFileIntegration, {
       requestParameters: { "method.request.querystring.name": true },
     });
