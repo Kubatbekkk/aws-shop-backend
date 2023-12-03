@@ -23,10 +23,7 @@ export const handler = async (event: S3Event) => {
     const item = await s3Client.send(getObjectCommand);
 
     if (item.Body instanceof Readable) {
-      item.Body.pipe(csvParser()).on("data", (err: unknown, data: unknown) => {
-        if (err) {
-          console.error(err);
-        }
+      item.Body.pipe(csvParser()).on("data", (data: unknown) => {
         console.info(`IMPORT FILE PARSER::`, data);
       });
     }
