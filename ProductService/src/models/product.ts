@@ -4,3 +4,11 @@ export type Product = {
   description: string;
   price: number;
 };
+
+export type FoundProduct = {
+  id?: string;
+  title: string;
+  price: number;
+  description: string;
+  count: number;
+};
