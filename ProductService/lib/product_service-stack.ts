@@ -31,6 +31,9 @@ export class ProductServiceStack extends cdk.Stack {
             },
         })
 
+        const email = 'k.mirzabekuulu@gmail.com'
+        const alternativeEmail = 'kubineccastro@gmail.com'
+
         const createProductTopic = new sns.Topic(this, 'createProductTopic', {
             displayName: 'Product Creation Notifications',
             topicName: 'create-product-topic',
@@ -46,9 +49,24 @@ export class ProductServiceStack extends cdk.Stack {
             },
         }
 
-        const email = 'k.mirzabekuulu@gmail.com'
         createProductTopic.addSubscription(
-            new subscriptions.EmailSubscription(email)
+            new subscriptions.EmailSubscription(email, {
+                filterPolicy: {
+                    price: sns.SubscriptionFilter.numericFilter({
+                        greaterThanOrEqualTo: 100,
+                    }),
+                },
+            })
+        )
+
+        createProductTopic.addSubscription(
+            new subscriptions.EmailSubscription(alternativeEmail, {
+                filterPolicy: {
+                    price: sns.SubscriptionFilter.numericFilter({
+                        lessThan: 100,
+                    }),
+                },
+            })
         )
 
         const productsTable = dynamodb.Table.fromTableAttributes(

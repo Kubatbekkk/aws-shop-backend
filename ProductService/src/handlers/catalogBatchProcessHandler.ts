@@ -89,6 +89,12 @@ async function notifyProductCreation(
         TopicArn: SNS_TOPIC_ARN,
         Message: `New product created: ${JSON.stringify(productItem)}`,
         Subject: 'Product Creation Notification',
+        MessageAttributes: {
+            price: {
+                DataType: 'Number',
+                StringValue: productItem.price.toString(),
+            },
+        },
     })
     await snsClient.send(publishCommand)
 }
