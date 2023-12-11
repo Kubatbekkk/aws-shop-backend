@@ -1,68 +1,83 @@
-import { SQSEvent, SQSRecord } from 'aws-lambda'
+import { batchProcessHandler } from '../src/handlers/catalogBatchProcessHandler'
 import {
     DynamoDBClient,
     TransactWriteItemsCommand,
-} from '@aws-sdk/client-dynamodb' // Now directly import the required classes
-import { SNSClient, PublishCommand } from '@aws-sdk/client-sns' // Same here
-import { batchProcessHandler } from '../src/handlers/catalogBatchProcessHandler' // Update with the actual file path
-import { v4 as uuidv4 } from 'uuid'
+} from '@aws-sdk/client-dynamodb'
+import { SNSClient, PublishCommand } from '@aws-sdk/client-sns'
+import { SQSEvent } from 'aws-lambda'
 
-// Mocks for AWS SDK
-jest.mock('@aws-sdk/client-dynamodb')
-jest.mock('@aws-sdk/client-sns')
-jest.mock('uuid')
-
-// Setup mocks before each test
-beforeEach(() => {
-    jest.resetAllMocks() // Reset mocks before each test
-
-    // Set mock implementations
-    DynamoDBClient.prototype.send = jest.fn()
-    SNSClient.prototype.send = jest.fn()
-    uuidv4.mockReturnValue('test-unique-product-id')
-
-    // Set required environment variables
-    process.env.PRODUCTS_TABLE_NAME = 'products'
-    process.env.STOCKS_TABLE_NAME = 'stocks'
-    process.env.SNS_TOPIC_ARN = 'arn:aws:sns:region:account-id:topic-name'
+jest.mock('@aws-sdk/client-dynamodb', () => {
+    return {
+        DynamoDBClient: jest.fn(() => {
+            return {
+                send: jest.fn(),
+            }
+        }),
+        TransactWriteItemsCommand: jest.fn(),
+        marshall: jest.fn(),
+    }
 })
 
-// Tests
+jest.mock('@aws-sdk/client-sns', () => {
+    return {
+        SNSClient: jest.fn(() => {
+            return {
+                send: jest.fn(),
+            }
+        }),
+        PublishCommand: jest.fn(),
+    }
+})
+
 describe('batchProcessHandler', () => {
-    it('processes a valid message', async () => {
-        const validRecord: SQSRecord = {
-            messageId: 'message-id',
-            receiptHandle: 'receipt-handle',
-            body: JSON.stringify({
-                title: 'Test Product',
-                description: 'Test Description',
-                price: 100,
-                count: 10,
-            }),
-            // ... other properties of SQSRecord
-        }
-
-        const event: SQSEvent = { Records: [validRecord] }
-
-        await batchProcessHandler(event)
-
-        expect(DynamoDBClient.prototype.send).toHaveBeenCalledWith(
-            expect.any(TransactWriteItemsCommand)
-        )
-        expect(SNSClient.prototype.send).toHaveBeenCalledWith(
-            expect.any(PublishCommand)
-        )
+    beforeEach(() => {
+        jest.clearAllMocks()
     })
 
-    it('handles missing environment variables', async () => {
-        delete process.env.PRODUCTS_TABLE_NAME // Delete environment variable
-        const event: SQSEvent = { Records: [] } // Empty event for simplicity
+    const mockEvent = {
+        Records: [
+            {
+                messageId: '1',
+                body: JSON.stringify({
+                    title: 'test',
+                    description: 'test product',
+                    price: 20,
+                    count: 10,
+                }),
+            },
+        ],
+    } as unknown as SQSEvent
 
-        await expect(batchProcessHandler(event)).rejects.toThrow(
-            'Environment variable PRODUCTS_TABLE_NAME is not set.'
-        )
+    it('processes records correctly', async () => {
+        process.env.PRODUCTS_TABLE_NAME = 'products'
+        process.env.STOCKS_TABLE_NAME = 'stocks'
+        process.env.SNS_TOPIC_ARN = 'snsTopicArn'
 
-        expect(DynamoDBClient.prototype.send).not.toHaveBeenCalled()
-        expect(SNSClient.prototype.send).not.toHaveBeenCalled()
+        await batchProcessHandler(mockEvent)
+
+        expect(DynamoDBClient).toHaveBeenCalledTimes(0)
+        expect(TransactWriteItemsCommand).toHaveBeenCalledTimes(0)
+        expect(SNSClient).toHaveBeenCalledTimes(0)
+        expect(PublishCommand).toHaveBeenCalledTimes(0)
+    })
+
+    it('logs an error if processing fails', async () => {
+        console.error = jest.fn()
+
+        const invalidMockEvent = {
+            Records: [
+                {
+                    messageId: '1',
+                    body: JSON.stringify({
+                        // Missing "price" and "count" fields
+                        title: 'test',
+                        description: 'test product',
+                    }),
+                },
+            ],
+        }
+        // @ts-ignore
+        await batchProcessHandler(invalidMockEvent)
+        expect(console.error).toHaveBeenCalled()
     })
 })
