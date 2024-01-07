@@ -69,7 +69,7 @@ function cleanProductData(data: Record<string, any>): Record<string, any> {
 }
 
 function validateProductData(data: Record<string, any>): void {
-    const requiredFields = ['title', 'description', 'price', 'count']
+    const requiredFields = ['title', 'description', 'price', 'count', 'image']
     for (const field of requiredFields) {
         if (!(field in data)) {
             throw new Error(`Missing required field: ${field}`)

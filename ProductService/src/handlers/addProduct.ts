@@ -16,6 +16,7 @@ type IncomingProductData = {
     description: string
     price: number
     count: number
+    image?: string
 }
 
 const validateProductData = (
@@ -74,6 +75,7 @@ export const addProduct = async (event: APIGatewayProxyEvent) => {
         title: productData.title,
         description: productData.description,
         price: productData.price,
+        image: productData.image || '',
     }
 
     const stockItem = {
