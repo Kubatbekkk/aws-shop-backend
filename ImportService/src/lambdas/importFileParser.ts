@@ -7,8 +7,12 @@ import {
   CopyObjectCommand,
   DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
+import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
 import { Readable } from "stream";
 const csvParser = require("csv-parser");
+
+const sqsClient = new SQSClient({});
+const queueUrl = process.env.SQS_QUEUE_URL;
 
 export const handler = async (event: S3Event) => {
   const s3Client = new S3Client();
@@ -28,9 +32,18 @@ export const handler = async (event: S3Event) => {
     const item = await s3Client.send(getObjectCommand);
 
     if (item.Body instanceof Readable) {
+
       const parsedRecords = [];
+
       for await (const data of item.Body.pipe(csvParser())) {
-        console.info(`IMPORT FILE PARSER::`, data);
+
+        const sendMessageCommand = new SendMessageCommand({
+          QueueUrl: queueUrl,
+          MessageBody: JSON.stringify(data),
+        });
+
+        await sqsClient.send(sendMessageCommand);
+
         parsedRecords.push(data);
       }
 

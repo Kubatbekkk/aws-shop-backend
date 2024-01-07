@@ -14,15 +14,23 @@ export class ImportServiceStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
+    const importedQueueUrl = cdk.Fn.importValue('CatalogItemsQueueUrl');
+    const importedQueueARN = cdk.Fn.importValue('CatalogItemsQueueARN');
+
+
+
     const bucket = Bucket.fromBucketName(
       this,
       "Import Bucket",
       "rs-import-service-bucket"
-    );
+      );
 
     const lambdaGeneralProps: Partial<NodejsFunctionProps> = {
       runtime: Runtime.NODEJS_18_X,
       handler: "handler",
+      environment: {
+        SQS_QUEUE_URL: importedQueueUrl
+      }
     };
 
     const importProductsFile = new NodejsFunction(this, "importProductsFile", {
@@ -48,10 +56,10 @@ export class ImportServiceStack extends cdk.Stack {
     const importResource = api.root.addResource("import");
     const importProductsFileIntegration = new LambdaIntegration(
       importProductsFile
-    );
-    importResource.addMethod("GET", importProductsFileIntegration, {
-      requestParameters: { "method.request.querystring.name": true },
-    });
+      );
+      importResource.addMethod("GET", importProductsFileIntegration, {
+        requestParameters: { "method.request.querystring.name": true },
+      });
 
     // importFileParser
     const importFileParser = new NodejsFunction(
@@ -61,7 +69,14 @@ export class ImportServiceStack extends cdk.Stack {
         ...lambdaGeneralProps,
         entry: path.join(__dirname, "/../src/lambdas/importFileParser.ts"),
       }
-    );
+      );
+    // const importFileParserRole = importFileParser.role;
+    const policyStatement = new cdk.aws_iam.PolicyStatement({
+      actions: ["sqs:sendMessage"],
+      resources:[importedQueueARN]
+    })
+
+    importFileParser.addToRolePolicy(policyStatement)
 
     importFileParser.addEventSource(
       new S3EventSource(bucket as Bucket, {
